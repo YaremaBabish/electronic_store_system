@@ -1,0 +1,131 @@
+USE electronicstoresystem;
+
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.position,
+    d.departament_name,
+    CONCAT(m.first_name, ' ', m.last_name) AS manager_full_name
+FROM employee e
+JOIN departament d ON e.departament_id = d.departament_id
+LEFT JOIN employee m ON e.manager_id = m.employee_id;
+
+SELECT 
+    o.orders_id,
+    o.transaction_moment,
+    c.first_name AS customer_first_name,
+    c.last_name AS customer_last_name,
+    p.product_name,
+    o.amount,
+    o.transaction_type,
+    e.first_name AS employee_first_name,
+    e.last_name AS employee_last_name
+FROM orders o
+JOIN customer c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+JOIN employee e ON o.employee_id = e.employee_id;
+
+SELECT 
+    product_id,
+    product_name,
+    product_description,
+    catecory,
+    manufacture,
+    product_type,
+    amount,
+    price
+FROM product;
+
+SELECT 
+    pr.provider_name,
+    pr.contact_person,
+    pr.phone_number,
+    pr.email,
+    pr.product_type_supplied,
+    f.factory_name,
+    f.city,
+    f.street
+FROM provider pr
+JOIN factory f ON pr.factory_id = f.factory_id;
+
+SELECT 
+    customer_id,
+    first_name,
+    last_name,
+    gender,
+    birth_date,
+    phone_number,
+    email,
+    discount
+FROM customer;
+
+SELECT 
+    f.factory_id,
+    f.factory_name,
+    f.city,
+    f.street,
+    d.departament_name
+FROM factory f
+JOIN departament d ON f.departament_id = d.departament_id;
+
+SELECT 
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS full_name,
+    COUNT(o.orders_id) AS total_orders
+FROM customer c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id;
+
+SELECT * FROM product
+WHERE catecory = 'Смартфони';
+
+SELECT * FROM product
+WHERE product_name LIKE '%Samsung%';
+
+SELECT * FROM product
+WHERE product_description LIKE '%AMOLED%';
+
+SELECT * FROM product
+WHERE price <= 10000;
+
+INSERT INTO employee (
+    user_name, first_name, last_name, position,
+    employee_date, departament_id, manager_id, rate, bonus
+) VALUES (
+    'newuser', 'Петро', 'Нечипоренко', 'Аналітик',
+    '2025-05-07', 2, 1, 17000, 1500
+);
+
+DELETE FROM employee
+WHERE employee_id = 10;
+
+SELECT first_name, last_name
+FROM employee
+WHERE departament_id = (
+  SELECT departament_id FROM employee WHERE employee_id = 3
+);
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE employee
+SET bonus = bonus + 500
+WHERE user_name = 'jdoe'
+  AND rate > (
+    SELECT avg_rate FROM (
+      SELECT AVG(rate) AS avg_rate FROM employee
+    ) AS subquery
+  );
+
+SET SQL_SAFE_UPDATES = 1;
+
+UPDATE employee
+SET bonus = bonus + 500
+WHERE employee_id = 1 
+  AND user_name = 'jdoe'
+  AND rate > (
+    SELECT avg_rate FROM (
+      SELECT AVG(rate) AS avg_rate FROM employee
+    ) AS subquery
+  );
+
